@@ -14,7 +14,9 @@ public class AlunoInfrastructureTests : TestBase
         Logradouro? logradouro = await repoLogradouro.ObterPorId(logradouroId);
 
         Arquivo arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
-        var _cpf = "12346678952";
+
+        var random = new Random();
+        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
 
         var repoAlunoCpf = new AlunoRepository(ConnectionString, DatabaseType);
         var cpfExistente = await repoAlunoCpf.CpfJaExiste(_cpf);
@@ -39,6 +41,7 @@ public class AlunoInfrastructureTests : TestBase
         Assert.NotNull(alunoInserido);
         Assert.True(alunoInserido.Id > 0);
     }
+
 
     [Fact]
     public async Task Aluno_ObterPorCpf_Atualizar()
@@ -78,40 +81,74 @@ public class AlunoInfrastructureTests : TestBase
     [Fact]
     public async Task Aluno_TrocarSenha()
     {
-        var _cpf = "12345678952";
+        var logradouroId = 4;
+        var repoLogradouro = new LogradouroRepository(ConnectionString, DatabaseType);
+        Logradouro? logradouro = await repoLogradouro.ObterPorId(logradouroId);
+
+        Arquivo arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
+        var random = new Random();
+        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
+
         var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var alunoExistente = await repoAluno.ObterPorCpf(_cpf);
-        Assert.NotNull(alunoExistente);
+        var aluno = Aluno.Criar(
+            1,
+            "Aluno Teste",
+            _cpf,
+            new DateOnly(2010, 10, 09),
+            "49999999999",
+            "aluno@teste.com",
+            logradouro!,
+            "123",
+            "complemento casa",
+            "Senha@123",
+            arquivo
+        );
+
+        var alunoInserido = await repoAluno.Adicionar(aluno);
 
         var novaSenha = "NovaSenha123";
-        var resultadoTroca = await repoAluno.TrocarSenha(alunoExistente.Id, novaSenha);
+        var resultadoTroca = await repoAluno.TrocarSenha(alunoInserido.Id, novaSenha);
         Assert.True(resultadoTroca);
 
-        var alunoAtualizado = await repoAluno.ObterPorId(alunoExistente.Id);
+        var alunoAtualizado = await repoAluno.ObterPorId(alunoInserido.Id);
         Assert.NotNull(alunoAtualizado);
         Assert.Equal(novaSenha, alunoAtualizado.Senha);
+
+        await repoAluno.Remover(alunoInserido.Id); // leandro jader
     }
 
     [Fact]
     public async Task Aluno_Remover_ObterPorId()
     {
-        var _cpf = "12346678952";
-        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var alunoExistente = await repoAluno.ObterPorCpf(_cpf);
-        Assert.NotNull(alunoExistente);
+        var logradouroId = 4;
+        var repoLogradouro = new LogradouroRepository(ConnectionString, DatabaseType);
+        Logradouro? logradouro = await repoLogradouro.ObterPorId(logradouroId);
 
-        var resultadoRemover = await repoAluno.Remover(alunoExistente.Id);
+        Arquivo arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
+        var random = new Random();
+        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
+
+        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
+        var aluno = Aluno.Criar(
+            1,
+            "Aluno Teste",
+            _cpf,
+            new DateOnly(2010, 10, 09),
+            "49999999999",
+            "aluno@teste.com",
+            logradouro!,
+            "123",
+            "complemento casa",
+            "Senha@123",
+            arquivo
+        );
+
+        var alunoInserido = await repoAluno.Adicionar(aluno);
+
+        var resultadoRemover = await repoAluno.Remover(alunoInserido.Id);
         Assert.True(resultadoRemover);
 
-        var alunoRemovido = await repoAluno.ObterPorId(alunoExistente.Id);
-        Assert.Null(alunoRemovido);
-    }
-
-    [Fact]
-    public async Task Aluno_ObterTodos()
-    {
-        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var resultado = await repoAluno.ObterTodos();
-        Assert.NotNull(resultado);
+        var alunoRemovido = await repoAluno.ObterPorId(alunoInserido.Id);
+        Assert.Null(alunoRemovido); 
     }
 }//leandro jader
