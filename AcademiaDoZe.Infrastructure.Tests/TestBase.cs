@@ -25,6 +25,5 @@ public abstract class TestBase
         var connectionString = "Server=127.0.0.1;Port=3306;Database=db_academia_do_ze_test;Uid=root;Pwd=lilica123;";
         return (connectionString, DatabaseType.MySql);
     }
-
-
-} //leandro jader
+}
+//leandro jader

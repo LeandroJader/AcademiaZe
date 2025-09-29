@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Domain.Entities;
+﻿
+using AcademiaDoZe.Domain.Entities;
 using AcademiaDoZe.Infrastructure.Repositories;
 using AcademiaDoZe.Infrastructure.Tests;
 
@@ -91,4 +92,5 @@ public class LogradouroInfrastructureTests : TestBase
         var resultado = await repoLogradouroTodos.ObterTodos();
         Assert.NotNull(resultado);
     }
-}//leandro jader
+}
+//leandro jader

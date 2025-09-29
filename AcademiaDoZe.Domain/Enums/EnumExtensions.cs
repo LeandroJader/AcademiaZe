@@ -13,4 +13,6 @@ public static class EnumExtensions
 
     }
 }
+// Console.WriteLine( EMatriculaRestricoes.ProblemasRespiratorios.GetDisplayName() );
+// Exibe: Problemas Respiratórios
 //leandro jader

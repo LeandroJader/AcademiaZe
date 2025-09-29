@@ -1,4 +1,4 @@
-﻿//Iago Henrique Schlemper
+﻿
 using AcademiaDoZe.Application.DependencyInjection;
 using AcademiaDoZe.Application.Enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,3 +26,4 @@ public static class DependencyInjection
         return services.BuildServiceProvider();
     }
 }
+//LEANDRO JADER

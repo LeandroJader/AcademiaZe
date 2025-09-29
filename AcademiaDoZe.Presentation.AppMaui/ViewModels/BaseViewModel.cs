@@ -28,10 +28,8 @@ namespace AcademiaDoZe.Presentation.AppMaui.ViewModels
 
         }
     }
+    // ObservableObject é uma classe base que implementa a interface INotifyPropertyChanged.
+    // Permitindo que as propriedades notifiquem automaticamente quando seus valores mudem.
+    // Isso é útil para atualizar a interface do usuário em resposta a mudanças nos dados.
+    // O atributo [ObservableProperty] é um recurso do CommunityToolkit.Mvvm que simplifica a criação de propriedades observáveis.
 }
-// ObservableObject é uma classe base que implementa a interface INotifyPropertyChanged.
-// Permitindo que as propriedades notifiquem automaticamente quando seus valores mudem.
-// Isso é útil para atualizar a interface do usuário em resposta a mudanças nos dados.
-// O atributo [ObservableProperty] é um recurso do CommunityToolkit.Mvvm que simplifica a criação de propriedades observáveis.
-
-//Leandro Jader

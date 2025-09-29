@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace AcademiaDoZe.Application.Enums;
@@ -14,5 +15,6 @@ public static class EnumExtensions
 
     }
 }
-
-//leandro jader
+// Console.WriteLine( EMatriculaRestricoes.ProblemasRespiratorios.GetDisplayName() );
+// Exibe: Problemas Respiratórios
+//Leandro Jader

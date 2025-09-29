@@ -9,6 +9,8 @@ public class LogradouroApplicationTests
 {
     // Configurações de conexão
     const string connectionString = "Server=127.0.0.1;Port=3306;Database=db_academia_do_ze_test;Uid=root;Pwd=lilica123;";
+
+
     const EAppDatabaseType databaseType = EAppDatabaseType.MySql;
     [Fact(Timeout = 60000)]
     public async Task LogradouroService_Integracao_Adicionar_Obter_Atualizar_Remover()
@@ -89,4 +91,4 @@ public class LogradouroApplicationTests
         }
     }
 }
-//leandro jader
+//LEANDRO JADER

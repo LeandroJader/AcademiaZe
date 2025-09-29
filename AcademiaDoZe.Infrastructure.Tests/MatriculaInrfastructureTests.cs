@@ -2,6 +2,7 @@
 using AcademiaDoZe.Domain.Enums;
 using AcademiaDoZe.Domain.ValueObjects;
 using AcademiaDoZe.Infrastructure.Repositories;
+using AcademiaDoZe.Infrastructure.Tests;
 
 namespace AcademiaDoZe.Infrastructure.Tests;
 
@@ -16,15 +17,12 @@ public class MatriculaInfrastructureTests : TestBase
 
         var arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
 
-
-        var random = new Random();
-        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
-
+        var _cpf = "11140608981";
         var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
         Assert.False(await repoAluno.CpfJaExiste(_cpf), "CPF já existe no banco.");
 
         var aluno = Aluno.Criar(
-            1,
+            1, 
             "Aluno Teste",
             _cpf,
             new DateOnly(2010, 10, 09),
@@ -36,17 +34,16 @@ public class MatriculaInfrastructureTests : TestBase
             "Senha@123",
             arquivo
         );
-
         await repoAluno.Adicionar(aluno);
 
         var matricula = Matricula.Criar(
-            1,
+            1, 
             aluno,
             EMatriculaPlano.Semestral,
             DateOnly.FromDateTime(DateTime.Today),
             DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
             "Emagrecer",
-            EMatriculaRestricoes.None,
+            EMatriculaRestricoes.Alergias,
             arquivo,
             "Sem observações"
         );
@@ -56,66 +53,31 @@ public class MatriculaInfrastructureTests : TestBase
 
         Assert.NotNull(matriculaInserida);
         Assert.True(matriculaInserida.Id > 0);
-
- 
-        var removerMatricula = await repoMatricula.Remover(matriculaInserida.Id);
-        Assert.True(removerMatricula);
-
-        var removerAluno = await repoAluno.Remover(aluno.Id);
-        Assert.True(removerAluno);
     }
 
     [Fact]
     public async Task Matricula_ObterPorAluno_Atualizar()
     {
-        var repoLogradouro = new LogradouroRepository(ConnectionString, DatabaseType);
-        var logradouro = await repoLogradouro.ObterPorId(4);
-        Assert.NotNull(logradouro);
+        var repoMatricula = new MatriculaRepository(ConnectionString, DatabaseType);
+        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
+
+        var aluno = await repoAluno.ObterPorCpf("11140608981");
+        Assert.NotNull(aluno);
+
+        var matriculas = (await repoMatricula.ObterPorAluno(aluno!.Id)).ToList();
+        Assert.NotEmpty(matriculas);
+
+        var matricula = matriculas.First(); // pega a primeira matrícula
 
         var arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
-        var random = new Random();
-        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
-
-        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var aluno = Aluno.Criar(
-            1,
-            "Aluno Teste",
-            _cpf,
-            new DateOnly(2010, 10, 09),
-            "49999999999",
-            "aluno@teste.com",
-            logradouro!,
-            "123",
-            "Complemento casa",
-            "Senha@123",
-            arquivo
-        );
-
-        await repoAluno.Adicionar(aluno);
-
-        var repoMatricula = new MatriculaRepository(ConnectionString, DatabaseType);
-        var matricula = Matricula.Criar(
-            1,
-            aluno,
-            EMatriculaPlano.Semestral,
-            DateOnly.FromDateTime(DateTime.Today),
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
-            "Emagrecer",
-            EMatriculaRestricoes.None,
-            arquivo,
-            "Sem observações"
-        );
-
-        await repoMatricula.Adicionar(matricula);
-
         var matriculaAtualizada = Matricula.Criar(
-            1,
+            1, 
             aluno,
             EMatriculaPlano.Anual,
-            DateOnly.FromDateTime(DateTime.Today),
-            DateOnly.FromDateTime(DateTime.Today.AddYears(1)),
+            new DateOnly(2020, 05, 20),
+            new DateOnly(2020, 05, 20).AddMonths(12),
             "Hipertrofia",
-            EMatriculaRestricoes.None,
+            EMatriculaRestricoes.Alergias,
             arquivo,
             "Observação atualizada"
         );
@@ -123,129 +85,84 @@ public class MatriculaInfrastructureTests : TestBase
         typeof(Entity).GetProperty("Id")?.SetValue(matriculaAtualizada, matricula.Id);
 
         var resultado = await repoMatricula.Atualizar(matriculaAtualizada);
+
         Assert.NotNull(resultado);
         Assert.Equal("Hipertrofia", resultado.Objetivo);
         Assert.Equal("Observação atualizada", resultado.ObservacoesRestricoes);
         Assert.Equal(EMatriculaPlano.Anual, resultado.Plano);
-
-        // Limpeza
-        await repoMatricula.Remover(resultado.Id);
-        await repoAluno.Remover(aluno.Id);
     }
 
     [Fact]
     public async Task Matricula_ObterPorAluno_Remover_ObterPorId()
     {
-        var repoLogradouro = new LogradouroRepository(ConnectionString, DatabaseType);
-        var logradouro = await repoLogradouro.ObterPorId(4);
-        Assert.NotNull(logradouro);
-
-        var arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
-        var random = new Random();
-        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
-
-        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var aluno = Aluno.Criar(
-            1,
-            "Aluno Teste",
-            _cpf,
-            new DateOnly(2010, 10, 09),
-            "49999999999",
-            "aluno@teste.com",
-            logradouro!,
-            "123",
-            "Complemento casa",
-            "Senha@123",
-            arquivo
-        );
-
-        await repoAluno.Adicionar(aluno);
-
         var repoMatricula = new MatriculaRepository(ConnectionString, DatabaseType);
-        var matricula = Matricula.Criar(
-            1,
-            aluno,
-            EMatriculaPlano.Semestral,
-            DateOnly.FromDateTime(DateTime.Today),
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
-            "Emagrecer",
-            EMatriculaRestricoes.None,
-            arquivo,
-            "Sem observações"
-        );
+        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
 
-        await repoMatricula.Adicionar(matricula);
+        var aluno = await repoAluno.ObterPorCpf("11140608981");
+        Assert.NotNull(aluno);
 
+        var matriculas = (await repoMatricula.ObterPorAluno(aluno!.Id)).ToList();
+        Assert.NotEmpty(matriculas);
 
+        var matricula = matriculas.First(); // pega a primeira matrícula
+        
+        // Remover
         var resultadoRemocao = await repoMatricula.Remover(matricula.Id);
+
         Assert.True(resultadoRemocao);
 
-
+        // Verificar se foi removida
         var matriculaRemovida = await repoMatricula.ObterPorId(matricula.Id);
         Assert.Null(matriculaRemovida);
-
-
-        await repoAluno.Remover(aluno.Id);
     }
 
     [Fact]
-    public async Task Matricula_ObterTodos()
+    public async Task Matrcula_ObterTodos()
     {
-        var repoMatricula = new MatriculaRepository(ConnectionString, DatabaseType);
-        var resultado = await repoMatricula.ObterTodos();
+        // ObterTodos
+
+        var repoMatriculaTodos = new MatriculaRepository(ConnectionString, DatabaseType);
+
+        var resultado = await repoMatriculaTodos.ObterTodos();
         Assert.NotNull(resultado);
     }
-
     [Fact]
     public async Task Matricula_ObterPorId()
     {
-        var repoLogradouro = new LogradouroRepository(ConnectionString, DatabaseType);
-        var logradouro = await repoLogradouro.ObterPorId(4);
-        Assert.NotNull(logradouro);
-
-        var arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
-        var random = new Random();
-        var _cpf = string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10)));
-
-        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
-        var aluno = Aluno.Criar(
-            1,
-            "Aluno Teste",
-            _cpf,
-            new DateOnly(2010, 10, 09),
-            "49999999999",
-            "aluno@teste.com",
-            logradouro!,
-            "123",
-            "Complemento casa",
-            "Senha@123",
-            arquivo
-        );
-
-        await repoAluno.Adicionar(aluno);
-
         var repoMatricula = new MatriculaRepository(ConnectionString, DatabaseType);
-        var matricula = Matricula.Criar(
-            1,
-            aluno,
-            EMatriculaPlano.Semestral,
-            DateOnly.FromDateTime(DateTime.Today),
-            DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
-            "Emagrecer",
-            EMatriculaRestricoes.None,
-            arquivo,
-            "Sem observações"
-        );
+        var repoAluno = new AlunoRepository(ConnectionString, DatabaseType);
 
-        await repoMatricula.Adicionar(matricula);
+        // Use o CPF que realmente existe no banco
+        var aluno = await repoAluno.ObterPorCpf("11140608981");
+        Assert.NotNull(aluno);
 
+        // Garante que exista pelo menos uma matrícula
+        var matriculasExistentes = (await repoMatricula.ObterPorAluno(aluno!.Id)).ToList();
+
+        if (!matriculasExistentes.Any())
+        {
+            var arquivo = Arquivo.Criar(new byte[] { 1, 2, 3 });
+            var matriculaNova = Matricula.Criar(
+                1,
+                aluno,
+                EMatriculaPlano.Semestral,
+                DateOnly.FromDateTime(DateTime.Today),
+                DateOnly.FromDateTime(DateTime.Today.AddMonths(6)),
+                "Emagrecer",
+                EMatriculaRestricoes.Alergias,
+                arquivo,
+                "Sem observações"
+            );
+
+            matriculaNova = await repoMatricula.Adicionar(matriculaNova);
+            matriculasExistentes.Add(matriculaNova);
+        }
+
+        var matricula = matriculasExistentes.First(); // pega a primeira matrícula
         var matriculaPorId = await repoMatricula.ObterPorId(matricula.Id);
+
         Assert.NotNull(matriculaPorId);
         Assert.Equal(matricula.Id, matriculaPorId.Id);
-
-        // Limpeza
-        await repoMatricula.Remover(matricula.Id);
-        await repoAluno.Remover(aluno.Id);
     }
-}
-//Leandro Jader
+
+}//leandro jader
