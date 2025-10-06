@@ -25,11 +25,15 @@ namespace AcademiaDoZe.Presentation.AppMaui
             builder.Services.AddTransient<DashboardListViewModel>();
             builder.Services.AddTransient<LogradouroListViewModel>();
             builder.Services.AddTransient<LogradouroViewModel>();
+            builder.Services.AddTransient<ColaboradorListViewModel>();
+            builder.Services.AddTransient<ColaboradorViewModel>();
             // Registrar Views
             builder.Services.AddTransient<DashboardListPage>();
             builder.Services.AddTransient<LogradouroListPage>();
             builder.Services.AddTransient<LogradouroPage>();
             builder.Services.AddTransient<ConfigPage>();
+            builder.Services.AddTransient<ColaboradorListPage>();
+            builder.Services.AddTransient<ColaboradorPage>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
@@ -37,3 +41,5 @@ namespace AcademiaDoZe.Presentation.AppMaui
         }
     }
 }
+//leandro jader
+//repositorio git  https://github.com/LeandroJader/AcademiaZe
