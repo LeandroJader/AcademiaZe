@@ -1,4 +1,5 @@
-﻿namespace AcademiaDoZe.Infrastructure.Exceptions;
+﻿//Alisson Rafael da Cruz Velho
+namespace AcademiaDoZe.Infrastructure.Exceptions;
 
 // Classe base para exceções de infraestrutura
 public class InfrastructureException : Exception
@@ -10,4 +11,3 @@ public class InfrastructureException : Exception
     {
     }
 }
-//leandro jader

@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Domain.Entities;
+﻿//Alisson Rafael da Cruz Velho
+using AcademiaDoZe.Domain.Entities;
 using AcademiaDoZe.Domain.Enums;
 using AcademiaDoZe.Domain.Repositories;
 using AcademiaDoZe.Domain.ValueObjects;
@@ -75,18 +76,30 @@ public class AlunoRepository : BaseRepository<Aluno>, IAlunoRepository
         }
         catch (DbException ex) { throw new InvalidOperationException($"Erro ao adicionar aluno: {ex.Message}", ex); }
     }
-    public async Task<Aluno?> ObterPorCpf(string cpf)
+    public async Task<IEnumerable<Aluno>> ObterPorCpf(string cpfPrefix)
     {
         try
         {
             await using var connection = await GetOpenConnectionAsync();
-            string query = $"SELECT * FROM {TableName} WHERE cpf = @Cpf";
+            string query = $"SELECT * FROM {TableName} WHERE cpf LIKE @CpfPrefix";
             await using var command = DbProvider.CreateCommand(query, connection);
-            command.Parameters.Add(DbProvider.CreateParameter("@Cpf", cpf, DbType.String, _databaseType));
-            using var reader = await command.ExecuteReaderAsync();
-            return await reader.ReadAsync() ? await MapAsync(reader) : null;
+            // parâmetro com sufixo '%' para buscar por prefixo
+
+            var parameterValue = (cpfPrefix ?? string.Empty).Trim() + "%";
+
+            command.Parameters.Add(DbProvider.CreateParameter("@CpfPrefix", parameterValue, DbType.String, _databaseType));
+            await using var reader = await command.ExecuteReaderAsync();
+            var alunos = new List<Aluno>();
+            while (await reader.ReadAsync())
+            {
+                alunos.Add(await MapAsync(reader));
+            }
+            return alunos;
         }
-        catch (DbException ex) { throw new InvalidOperationException($"Erro ao obter aluno pelo CPF {cpf}: {ex.Message}", ex); }
+        catch (DbException ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter aluno(s) pelo CPF '{cpfPrefix}': {ex.Message}", ex);
+        }
     }
     public override async Task<Aluno> Atualizar(Aluno entity)
     {

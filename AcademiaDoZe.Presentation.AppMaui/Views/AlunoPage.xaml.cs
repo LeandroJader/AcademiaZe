@@ -1,9 +1,9 @@
 using AcademiaDoZe.Presentation.AppMaui.ViewModels;
 using System.Text.RegularExpressions;
 namespace AcademiaDoZe.Presentation.AppMaui.Views;
-public partial class ColaboradorPage : ContentPage
+public partial class AlunoPage : ContentPage
 {
-    public ColaboradorPage(ColaboradorViewModel viewModel)
+    public AlunoPage(AlunoViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;
@@ -12,7 +12,7 @@ public partial class ColaboradorPage : ContentPage
     {
         base.OnAppearing();
 
-        if (BindingContext is ColaboradorViewModel viewModel)
+        if (BindingContext is AlunoViewModel viewModel)
 
         {
             await viewModel.InitializeAsync();

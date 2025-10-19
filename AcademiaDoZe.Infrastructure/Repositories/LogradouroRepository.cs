@@ -124,4 +124,3 @@ public class LogradouroRepository : BaseRepository<Logradouro>, ILogradouroRepos
         catch (DbException ex) { throw new InvalidOperationException($"ERRO_OBTER_LOGRADOURO_POR_CIDADE_{cidade}", ex); }
     }
 }
-//leandro jader
